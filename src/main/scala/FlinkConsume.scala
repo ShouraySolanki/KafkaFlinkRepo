@@ -1,5 +1,5 @@
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
+import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer, FlinkKafkaProducer}
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 import org.json4s.DefaultFormats
 import org.json4s.native.JsonMethods
@@ -12,7 +12,7 @@ object FlinkConsume {
 
   def main(args: Array[String]) {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    val outputTag = OutputTag[String]("side-output")
+
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val properties = new Properties()
     properties.setProperty("bootstrap.servers", "localhost:9092")
@@ -21,14 +21,34 @@ object FlinkConsume {
     val stream = env.addSource(new FlinkKafkaConsumer[String]("jsontest", new SimpleStringSchema(), properties))
 
     val jsonStream = stream.flatMap(raw => JsonMethods.parse(raw).toOption).map(_.extract[Sum])
+    val ingestStream = stream
+      .process(new FlinkProduceFunction())
 
-    //jsonStream.addSink(Sum=> s)
     val a = jsonStream.map(value=> value.a)
     val b = jsonStream.map(value=> value.b)
+    val typ = jsonStream.map(value=> value.typ)
       a.print()
       b.print()
-    val newSum:DataStream[Int] = jsonStream.map(value=> value.a + value.b)
-    print(newSum)
+      if (typ == "sum") {
+
+
+        val myProducer = new FlinkKafkaProducer[String](
+          "jsontest1",
+          new SimpleStringSchema(),
+          properties)
+        ingestStream.addSink(myProducer)
+      }
+    else{
+        val myProducer = new FlinkKafkaProducer[String](
+          "jsontest2",
+          new SimpleStringSchema(),
+          properties)
+        ingestStream.addSink(myProducer)
+      }
+
+
+    //    val newSum:DataStream[Int] = jsonStream.map(value=> value.a + value.b)
+    //print(newSum)
 
 //    val message = write(jsonStream)
 //    val messageGenerator = new MessageGenerator
