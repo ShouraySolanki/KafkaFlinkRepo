@@ -1,3 +1,5 @@
+package flinkjobs
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
@@ -5,12 +7,13 @@ import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.streaming.api.functions.ProcessFunction
 import org.apache.flink.streaming.api.scala.OutputTag
 import org.apache.flink.util.Collector
+import util.{Average, Sum, Total}
 
 import java.io.ByteArrayOutputStream
 
 
 
-class FlinkProduceFunction extends ProcessFunction[String, String]{
+class FlinkProcessFunction extends ProcessFunction[String, String]{
 
   lazy val state: ValueState[Sum] = getRuntimeContext.getState(new ValueStateDescriptor[Sum]("myState", classOf[Sum]))
   val sumOutputTag = OutputTag[String]("sum-output")
@@ -24,6 +27,8 @@ class FlinkProduceFunction extends ProcessFunction[String, String]{
 
     val total: Total = objectMapper.readValue[Total](value)
     val average: Average = objectMapper.readValue[Average](value)
+    println("a =" + total.getA(), "b =" + total.getB())
+
     if (total.getTyp() == "sum") {
       total.setSum(total.getA() + total.getB())
       objectMapper.writeValue(output, total)

@@ -16,6 +16,7 @@ libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.11
 libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.0"
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.7.4"
 libraryDependencies += "org.json4s" %% "json4s-native" % "4.0.2"
+libraryDependencies += "com.typesafe" % "config" % "1.4.1"
 
 
 

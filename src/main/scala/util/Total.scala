@@ -1,7 +1,11 @@
-class Average {
+package util
+
+
+class Total{
   private var a: Int = 0
   private var b: Int = 0
-  private var average:Int = 0
+  private var sum: Int = a + b
+  private var average:Int = (a + b)/2
   private var typ: String = null
 
   def getA(): Int ={
@@ -20,14 +24,14 @@ class Average {
   def setB(b : Int){
     this.b = b
   }
-
-
-  def setAverage(average : Int){
-    this.average = average
+  def getSum(): Int ={
+    sum
   }
-  def getAverage(): Int ={
-    average
+
+  def setSum(sum : Int){
+    this.sum = sum
   }
+
 
   def setTyp(typ : String){
     this.typ = typ
@@ -36,6 +40,7 @@ class Average {
     typ
   }
 
-  override def toString: String = "{" + "a=" + a + ", b=" + b  + ", type" + typ + ", average" + average +'}'
-
+  override def toString: String = "{" + "a=" + a + ", b=" + b + ", sum=" + sum + ", type" + typ + '}'
 }
+
+
