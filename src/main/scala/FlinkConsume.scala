@@ -12,7 +12,7 @@ object FlinkConsume {
 
   def main(args: Array[String]) {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-
+    val flinkProduceFunction = new FlinkProduceFunction
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val properties = new Properties()
     properties.setProperty("bootstrap.servers", "localhost:9092")
@@ -22,29 +22,37 @@ object FlinkConsume {
 
     val jsonStream = stream.flatMap(raw => JsonMethods.parse(raw).toOption).map(_.extract[Sum])
     val ingestStream = stream
-      .process(new FlinkProduceFunction())
+
+      .process(flinkProduceFunction)
 
     val a = jsonStream.map(value=> value.a)
     val b = jsonStream.map(value=> value.b)
     val typ = jsonStream.map(value=> value.typ)
       a.print()
       b.print()
-      if (typ == "sum") {
 
 
-        val myProducer = new FlinkKafkaProducer[String](
+
+
+        val mySumProducer = new FlinkKafkaProducer[String](
           "jsontest1",
           new SimpleStringSchema(),
           properties)
-        ingestStream.addSink(myProducer)
-      }
-    else{
-        val myProducer = new FlinkKafkaProducer[String](
-          "jsontest2",
-          new SimpleStringSchema(),
-          properties)
-        ingestStream.addSink(myProducer)
-      }
+        ingestStream.getSideOutput( flinkProduceFunction.sumOutputTag).addSink(mySumProducer)
+
+    val myAverageProducer = new FlinkKafkaProducer[String](
+      "jsontest2",
+      new SimpleStringSchema(),
+      properties)
+    ingestStream.getSideOutput( flinkProduceFunction.averageOutputTag).addSink(myAverageProducer)
+
+
+    /*  val myProducer = new FlinkKafkaProducer[String](
+        "jsontest2",
+        new SimpleStringSchema(),
+        properties)
+      ingestStream.addSink(myProducer)
+    */
 
 
     //    val newSum:DataStream[Int] = jsonStream.map(value=> value.a + value.b)

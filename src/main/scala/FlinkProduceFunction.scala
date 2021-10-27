@@ -13,7 +13,8 @@ import java.io.ByteArrayOutputStream
 class FlinkProduceFunction extends ProcessFunction[String, String]{
 
   lazy val state: ValueState[Sum] = getRuntimeContext.getState(new ValueStateDescriptor[Sum]("myState", classOf[Sum]))
-  val outputTag = OutputTag[String]("side-output")
+  val sumOutputTag = OutputTag[String]("sum-output")
+  val averageOutputTag = OutputTag[String]("average-output")
   override def processElement(
                                value: String,
                                ctx: ProcessFunction[String, String]#Context,
@@ -26,16 +27,19 @@ class FlinkProduceFunction extends ProcessFunction[String, String]{
     if (total.getTyp() == "sum") {
       total.setSum(total.getA() + total.getB())
       objectMapper.writeValue(output, total)
+      out.collect(output.toString)
+      ctx.output(sumOutputTag,  String.valueOf(output))
     }
     else {
       average.setAverage((average.getA() + average.getB())/2)
       objectMapper.writeValue(output, average)
+      out.collect(output.toString)
+      ctx.output(averageOutputTag,  String.valueOf(output))
     }
 
 
 
-    out.collect(output.toString)
-    ctx.output(outputTag, "sideout-"+ String.valueOf(output))
+
 
   }
 
