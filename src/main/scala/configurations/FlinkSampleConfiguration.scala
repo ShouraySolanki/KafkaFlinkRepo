@@ -1,6 +1,8 @@
 package configurations
 
 import com.typesafe.config.Config
+import org.apache.flink.api.scala.createTypeInformation
+import org.apache.flink.streaming.api.scala.OutputTag
 
 class FlinkSampleConfiguration(val config: Config ) extends Serializable {
 
@@ -10,6 +12,8 @@ class FlinkSampleConfiguration(val config: Config ) extends Serializable {
   val jsontest1:String = config.getString("json.test1")
   val jsontest2:String = config.getString("json.test2")
 
-  //val sumOutputTag = OutputTag[String]("sum-output")
+  val sumOutputTag = OutputTag[String]("sum-output")
+  val averageOutputTag = OutputTag[String]("average-output")
+
 
 }

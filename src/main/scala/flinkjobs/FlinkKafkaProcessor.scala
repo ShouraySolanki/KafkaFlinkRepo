@@ -14,13 +14,13 @@ class FlinkKafkaProcessor(config: FlinkSampleConfiguration) {
 
   def process(): Unit = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    val flinkProduceFunction = new FlinkProcessFunction
+    val flinkProduceFunction = new FlinkProcessFunction(config)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val properties = new Properties()
     properties.setProperty("bootstrap.servers", "localhost:9092")
     properties.setProperty("zookeeper.connect", "localhost:2181")
     properties.setProperty("group.id", "consumerGroup")
-    val stream = env.addSource(new FlinkKafkaConsumer[String]("jsontest", new SimpleStringSchema(), properties))
+    val stream = env.addSource(new FlinkKafkaConsumer[String](config.jsontest, new SimpleStringSchema(), properties))
 
     //val jsonStream = stream.flatMap(raw => JsonMethods.parse(raw).toOption).map(_.extract[Sum])
     val ingestStream = stream
@@ -34,17 +34,16 @@ class FlinkKafkaProcessor(config: FlinkSampleConfiguration) {
     b.print()*/
 
 
-    val mySumProducer = new FlinkKafkaProducer[String](
-      config.jsontest1,
+    val mySumProducer = new FlinkKafkaProducer[String](config.jsontest1,
       new SimpleStringSchema(),
       properties)
-    ingestStream.getSideOutput(flinkProduceFunction.sumOutputTag).addSink(mySumProducer)
+    ingestStream.getSideOutput(config.sumOutputTag).addSink(mySumProducer)
 
     val myAverageProducer = new FlinkKafkaProducer[String](
-      "jsontest2",
+      config.jsontest2,
       new SimpleStringSchema(),
       properties)
-    ingestStream.getSideOutput(flinkProduceFunction.averageOutputTag).addSink(myAverageProducer)
+    ingestStream.getSideOutput(config.averageOutputTag).addSink(myAverageProducer)
 
 
     env.execute()
