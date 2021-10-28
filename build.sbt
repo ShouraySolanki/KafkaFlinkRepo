@@ -17,6 +17,13 @@ libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.7.4"
 libraryDependencies += "org.json4s" %% "json4s-native" % "4.0.2"
 libraryDependencies += "com.typesafe" % "config" % "1.4.1"
+libraryDependencies += "org.mockito" %% "mockito-scala" % "1.16.46" % Test
+libraryDependencies += "org.apache.flink" %% "flink-test-utils" % flinkVersion
+libraryDependencies += "com.google.code.gson" % "gson" % "2.8.8"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.3.0-SNAP3" % Test
+
+
+
 
 
 
