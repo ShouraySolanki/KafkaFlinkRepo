@@ -5,13 +5,13 @@ import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import util.FlinkKafkaConnector
 
-class FlinkKafkaProcessor(config: FlinkSampleConfiguration) {
+class FlinkKafkaProcessor(config: FlinkSampleConfiguration, kafkaConnector: FlinkKafkaConnector) {
 
 
   def process(): Unit = {
 
     val flinkProduceFunction = new FlinkProcessFunction(config)
-    val kafkaConnector = new FlinkKafkaConnector(config)
+
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
 

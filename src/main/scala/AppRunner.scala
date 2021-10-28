@@ -1,6 +1,7 @@
 import com.typesafe.config.ConfigFactory
 import configurations.FlinkSampleConfiguration
 import flinkjobs.FlinkKafkaProcessor
+import util.FlinkKafkaConnector
 
 object AppRunner {
 
@@ -10,8 +11,10 @@ object AppRunner {
     /*val jsonconfig = jsonConfig.getString("test")
     print(jsonconfig)*/
 
+
     val flinkSampleConfiguration = new FlinkSampleConfiguration(config)
-    val  flinkConsume = new FlinkKafkaProcessor(flinkSampleConfiguration)
+    val kafkaConnector = new FlinkKafkaConnector(flinkSampleConfiguration)
+    val  flinkConsume = new FlinkKafkaProcessor(flinkSampleConfiguration,kafkaConnector )
 
     flinkConsume.process()
   }
